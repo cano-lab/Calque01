@@ -7,7 +7,7 @@ set -euo pipefail
 
 APP=/opt/calque/app
 BIN=/opt/calque/bin
-PORT="${PORT:-3001}"
+PORT="${PORT:-3002}"
 
 cd "$APP"
 git config --global --add safe.directory "$APP" 2>/dev/null || true

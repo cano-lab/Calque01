@@ -50,4 +50,4 @@ echo
 echo "Provisioning complete. Next:"
 echo "  1. cp .env.example /opt/calque/.env  and edit it"
 echo "  2. As deploy user: bash /opt/calque/app/scripts/deploy.sh   (builds + starts)"
-echo "  3. Point cloudflared at http://localhost:3001 (studio.clawpen.ca)"
+echo "  3. Point cloudflared at http://localhost:3002 (studio.clawpen.ca)"

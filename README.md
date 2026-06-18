@@ -15,7 +15,7 @@ structure, with control.
 student browser
    → clawpen.ca / studio.clawpen.ca   (DNS → Cloudflare Tunnel)
    → cloudflared on the GPU host (outbound only — no open ports)
-   → orchestrator  (Rust/Axum, :3001)  serves the web UI, proxies /api/*
+   → orchestrator  (Rust/Axum, :3002)  serves the web UI, proxies /api/*
    → worker        (Python/FastAPI, :8001)  image effects + GPU generation
 ```
 
@@ -36,10 +36,10 @@ pip install -r requirements.txt
 uvicorn calque.server:app --host 127.0.0.1 --port 8001
 
 # orchestrator (another shell)
-cd orchestrator && cargo run     # serves http://localhost:3001
+cd orchestrator && cargo run     # serves http://localhost:3002
 ```
 
-Open http://localhost:3001 — the UI proxies to the worker.
+Open http://localhost:3002 — the UI proxies to the worker.
 
 ## Deploy (GPU host)
 
@@ -47,7 +47,7 @@ Open http://localhost:3001 — the UI proxies to the worker.
 sudo bash scripts/setup-vps.sh      # one-time provisioning
 cp .env.example /opt/calque/.env    # edit
 bash /opt/calque/app/scripts/deploy.sh
-# then point cloudflared at http://localhost:3001
+# then point cloudflared at http://localhost:3002
 ```
 
 ## Status

@@ -82,7 +82,7 @@ async fn main() -> anyhow::Result<()> {
     let port: u16 = std::env::var("PORT")
         .ok()
         .and_then(|p| p.parse().ok())
-        .unwrap_or(3001);
+        .unwrap_or(3002);
     let worker_url =
         std::env::var("WORKER_URL").unwrap_or_else(|_| "http://127.0.0.1:8001".into());
     let static_dir = std::env::var("STATIC_DIR").unwrap_or_else(|_| "./static-site".into());
