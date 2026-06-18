@@ -1,0 +1,21 @@
+[Unit]
+Description=Calque Worker (Python image/GPU service)
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+User=calque
+Group=calque
+WorkingDirectory=/opt/calque/app/worker
+# Uses the venv created by setup-vps.sh
+ExecStart=/opt/calque/app/worker/.venv/bin/uvicorn calque.server:app --host 127.0.0.1 --port 8001
+EnvironmentFile=/opt/calque/.env
+Restart=on-failure
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=calque-worker
+
+[Install]
+WantedBy=multi-user.target

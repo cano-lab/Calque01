@@ -1,0 +1,17 @@
+# Web service
+fastapi>=0.110
+uvicorn[standard]>=0.29
+python-multipart>=0.0.9
+
+# Image processing (CPU effects — VPS/CPU friendly)
+pillow>=10.0
+numpy>=1.24
+opencv-python-headless>=4.8
+
+# GPU generation path (diffusers/ControlNet) — install on the GPU host only.
+# Pin torch to a CUDA build matching your driver, e.g.:
+#   pip install torch --index-url https://download.pytorch.org/whl/cu124
+# torch>=2.2
+# diffusers>=0.27
+# transformers>=4.40
+# accelerate>=0.29

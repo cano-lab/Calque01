@@ -1,0 +1,19 @@
+name: Deploy Calque
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    # Self-hosted runner on the GPU host (WSL2), same pattern as Almanach.
+    runs-on: self-hosted
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Deploy
+        run: |
+          cp ./scripts/deploy.sh /opt/calque/app/scripts/deploy.sh || true
+          bash /opt/calque/app/scripts/deploy.sh

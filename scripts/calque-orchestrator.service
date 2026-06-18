@@ -1,0 +1,20 @@
+[Unit]
+Description=Calque Orchestrator (web front door)
+After=network.target calque-worker.service
+Wants=network.target
+
+[Service]
+Type=simple
+User=calque
+Group=calque
+WorkingDirectory=/opt/calque/app
+ExecStart=/opt/calque/bin/calque-orchestrator
+EnvironmentFile=/opt/calque/.env
+Restart=on-failure
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=calque
+
+[Install]
+WantedBy=multi-user.target
