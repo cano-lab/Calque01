@@ -31,10 +31,13 @@ python -m pip install --quiet --upgrade pip wheel
 echo "PHASE torch"
 python -c "import torch, sys; sys.exit(0 if torch.cuda.is_available() else 1)" 2>/dev/null \
   && echo "  torch+cuda already present" \
-  || pip install torch torchvision --index-url "$TORCH_INDEX"
+  || pip install torch torchvision torchaudio --index-url "$TORCH_INDEX"
 
 echo "PHASE requirements"
 pip install --quiet -r requirements.txt
+# ComfyUI's requirements may pull a torchaudio built for a different CUDA than
+# our torch wheel (causes 'libcudart.so.13 not found'). Re-pin to match torch.
+pip install --quiet torchaudio==2.6.0 --index-url "$TORCH_INDEX"
 
 echo "PHASE model-paths"
 cat > "$COMFY_DIR/extra_model_paths.yaml" <<YAML
