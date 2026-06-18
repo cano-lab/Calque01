@@ -18,6 +18,7 @@ from typing import Optional
 
 import requests
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response
 from PIL import Image
 
@@ -27,6 +28,12 @@ from .generator import ComfyClient
 from .build import GenParams, build_workflow, edge_strength_map
 
 app = FastAPI(title="Calque Worker", version="0.1.0")
+
+# In production the orchestrator fronts the worker; CORS here lets the UI talk
+# to the worker directly during development too.
+app.add_middleware(
+    CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"]
+)
 
 comfy = ComfyClient()
 

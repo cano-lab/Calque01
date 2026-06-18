@@ -1,114 +1,196 @@
 <!doctype html>
-<html lang="fr">
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Calque — atelier d'images</title>
+  <title>Calque — render studio</title>
   <style>
-    :root { --bg:#1a1714; --panel:#262019; --ink:#efe7da; --accent:#c8a25b; --muted:#8a7e6d; }
+    :root { --bg:#15120f; --panel:#211b15; --edge:#3a2f24; --ink:#efe7da; --accent:#c8a25b; --muted:#8a7e6d; }
     * { box-sizing: border-box; }
     body { margin:0; font-family: ui-sans-serif, system-ui, sans-serif; background:var(--bg); color:var(--ink); }
-    header { padding:1.5rem 2rem; border-bottom:1px solid #3a2f24; }
-    header h1 { margin:0; font-weight:600; letter-spacing:.04em; }
-    header p { margin:.25rem 0 0; color:var(--muted); font-size:.9rem; }
-    main { display:grid; grid-template-columns: 320px 1fr; gap:1.5rem; padding:1.5rem 2rem; }
-    .panel { background:var(--panel); border:1px solid #3a2f24; border-radius:10px; padding:1.25rem; }
-    label { display:block; font-size:.8rem; color:var(--muted); margin:.9rem 0 .3rem; }
-    select, input[type=range], input[type=file] { width:100%; }
-    button { margin-top:1.25rem; width:100%; padding:.7rem; background:var(--accent); color:#1a1714;
-      border:none; border-radius:8px; font-weight:600; cursor:pointer; }
-    button:disabled { opacity:.5; cursor:default; }
-    .stage { display:flex; align-items:center; justify-content:center; min-height:60vh;
-      border:1px dashed #3a2f24; border-radius:10px; background:#15120f; }
-    .stage img { max-width:100%; max-height:75vh; border-radius:6px; }
-    .row { display:flex; justify-content:space-between; font-size:.75rem; color:var(--muted); }
-    a.dl { display:none; margin-top:1rem; text-align:center; color:var(--accent); }
+    header { padding:1rem 1.5rem; border-bottom:1px solid var(--edge); display:flex; align-items:baseline; gap:1rem; }
+    header h1 { margin:0; font-weight:600; letter-spacing:.05em; }
+    header span { color:var(--muted); font-size:.85rem; }
+    main { display:grid; grid-template-columns: 360px 1fr; gap:1.25rem; padding:1.25rem 1.5rem; align-items:start; }
+    .panel { background:var(--panel); border:1px solid var(--edge); border-radius:10px; padding:1rem 1.1rem; }
+    h2 { font-size:.7rem; text-transform:uppercase; letter-spacing:.12em; color:var(--muted); margin:1.1rem 0 .5rem; }
+    h2:first-child { margin-top:0; }
+    label { display:block; font-size:.78rem; color:var(--muted); margin:.6rem 0 .2rem; }
+    input, select, textarea, button { font:inherit; color:var(--ink); background:#15120f; border:1px solid var(--edge);
+      border-radius:7px; padding:.45rem .55rem; width:100%; }
+    textarea { resize:vertical; min-height:54px; }
+    .row { display:flex; gap:.6rem; } .row > * { flex:1; }
+    .slider { display:flex; align-items:center; gap:.5rem; }
+    .slider input[type=range] { padding:0; } .slider output { font-size:.75rem; color:var(--accent); width:3.2rem; text-align:right; }
+    .seg { display:flex; border:1px solid var(--edge); border-radius:7px; overflow:hidden; }
+    .seg button { border:0; border-radius:0; background:transparent; color:var(--muted); }
+    .seg button.on { background:var(--accent); color:#15120f; font-weight:600; }
+    #drop { border:1px dashed var(--edge); border-radius:8px; min-height:120px; display:flex; align-items:center;
+      justify-content:center; text-align:center; color:var(--muted); font-size:.8rem; cursor:pointer; overflow:hidden; }
+    #drop img { max-width:100%; max-height:200px; }
+    #go { margin-top:1rem; background:var(--accent); color:#15120f; font-weight:700; border:0; padding:.7rem; cursor:pointer; }
+    #go:disabled { opacity:.5; cursor:default; }
+    .stage { background:#0e0c0a; border:1px solid var(--edge); border-radius:10px; min-height:70vh;
+      display:flex; align-items:center; justify-content:center; }
+    .stage img { max-width:100%; max-height:80vh; border-radius:6px; }
+    #status { color:var(--muted); font-size:.85rem; }
+    a.dl { display:none; margin-top:.8rem; text-align:center; color:var(--accent); }
   </style>
 </head>
 <body>
-  <header>
-    <h1>Calque</h1>
-    <p>Style posé sur la structure — watercolor · lithograph · anime</p>
-  </header>
+  <header><h1>Calque</h1><span>render studio — style over structure</span></header>
   <main>
     <section class="panel">
-      <label>Image source</label>
-      <input id="file" type="file" accept="image/*" />
+      <h2>Input</h2>
+      <div class="seg" id="mode">
+        <button data-mode="image" class="on">From image</button>
+        <button data-mode="text">From prompt</button>
+      </div>
+      <div id="imageInput">
+        <div id="drop">Drop, click, or paste an image</div>
+        <input id="file" type="file" accept="image/*" hidden />
+      </div>
 
-      <label>Style</label>
-      <select id="style">
-        <option value="watercolor">Aquarelle (watercolor)</option>
-        <option value="lithograph">Lithographie</option>
-        <option value="anime">Anime / cel</option>
-      </select>
+      <h2>Prompt</h2>
+      <textarea id="positive" placeholder="describe the look…">watercolor painting, loose washes, soft edges, interior room</textarea>
+      <label>Negative</label>
+      <textarea id="negative">photo, sharp, lowres, watermark, text</textarea>
 
-      <div id="params"></div>
+      <h2>Model</h2>
+      <label>Checkpoint</label><select id="ckpt"></select>
+      <label>LoRA</label><select id="lora"></select>
+      <div class="slider"><input type="range" id="lora_strength" min="0" max="1.5" step="0.05" value="1.0"><output></output></div>
 
-      <button id="go" disabled>Appliquer</button>
-      <a id="dl" class="dl" download="calque.png">Télécharger le résultat</a>
+      <h2>Sampling</h2>
+      <div class="row">
+        <div><label>Sampler</label><select id="sampler"></select></div>
+        <div><label>Scheduler</label><select id="scheduler"></select></div>
+      </div>
+      <label>Steps</label><div class="slider"><input type="range" id="steps" min="8" max="60" step="1" value="28"><output></output></div>
+      <label>CFG</label><div class="slider"><input type="range" id="cfg" min="1" max="14" step="0.5" value="7"><output></output></div>
+      <label>Denoise (img2img strength)</label><div class="slider"><input type="range" id="denoise" min="0.2" max="1" step="0.05" value="0.85"><output></output></div>
+      <div class="row">
+        <div><label>Seed (-1 random)</label><input id="seed" type="number" value="-1"></div>
+      </div>
+
+      <h2>Structure control</h2>
+      <label>Depth strength</label><div class="slider"><input type="range" id="depth_strength" min="0" max="1.5" step="0.05" value="0.5"><output></output></div>
+      <label>Lineart strength</label><div class="slider"><input type="range" id="lineart_strength" min="0" max="1.5" step="0.05" value="0.4"><output></output></div>
+
+      <h2 id="sizeHead" style="display:none">Output size</h2>
+      <div class="row" id="sizeRow" style="display:none">
+        <div><label>Width</label><input id="width" type="number" value="768" step="8"></div>
+        <div><label>Height</label><input id="height" type="number" value="512" step="8"></div>
+      </div>
+
+      <button id="go">Generate</button>
+      <a id="dl" class="dl" download="calque.png">Download result</a>
     </section>
-    <section class="stage"><div id="placeholder" style="color:var(--muted)">Charge une image pour commencer</div></section>
+
+    <section>
+      <div class="stage"><div id="status">Pick an image and a look, then Generate.</div></div>
+    </section>
   </main>
 
   <script>
-    const PARAMS = {
-      watercolor: [
-        ["paper_transparency", "Transparence papier", 0, 1, 0.5, 0.05],
-        ["wash_intensity", "Intensité des lavis", 0, 1, 0.7, 0.05],
-        ["dark_edges", "Bords sombres", 0, 1, 0.6, 0.05],
-        ["flow_amount", "Coulures", 0, 1, 0.5, 0.05],
-      ],
-      lithograph: [
-        ["contrast", "Contraste", 1, 3, 1.5, 0.1],
-        ["threshold", "Seuil", 0, 255, 128, 1],
-        ["halftone_size", "Trame (pts)", 0, 10, 4, 1],
-        ["grain_amount", "Grain", 0, 1, 0.1, 0.05],
-      ],
-      anime: [
-        ["edge_thickness", "Épaisseur trait", 0, 5, 2, 1],
-        ["edge_darkness", "Noirceur trait", 0, 1, 0.8, 0.05],
-        ["color_levels", "Niveaux couleur", 2, 16, 8, 1],
-        ["saturation", "Saturation", 0.5, 2, 1.2, 0.05],
-      ],
-    };
+    const API = new URLSearchParams(location.search).get("api") || "/api";
+    const $ = id => document.getElementById(id);
+    let mode = "image", fileData = null;
 
-    const $ = (id) => document.getElementById(id);
-    const stage = document.querySelector(".stage");
-
-    function renderParams() {
-      const style = $("style").value;
-      $("params").innerHTML = PARAMS[style]
-        .map(([k, lbl, min, max, def, step]) =>
-          `<label>${lbl} <span class="row"><span></span><span id="v_${k}">${def}</span></span></label>
-           <input type="range" id="p_${k}" min="${min}" max="${max}" step="${step}" value="${def}"
-                  oninput="document.getElementById('v_${k}').textContent=this.value">`)
-        .join("");
-    }
-
-    $("style").addEventListener("change", renderParams);
-    $("file").addEventListener("change", () => { $("go").disabled = !$("file").files.length; });
-
-    $("go").addEventListener("click", async () => {
-      const style = $("style").value;
-      const fd = new FormData();
-      fd.append("image", $("file").files[0]);
-      for (const [k] of PARAMS[style]) fd.append(k, $(`p_${k}`).value);
-
-      $("go").disabled = true; $("go").textContent = "Traitement…";
-      try {
-        const res = await fetch(`/api/effect/${style}`, { method: "POST", body: fd });
-        if (!res.ok) throw new Error(await res.text());
-        const url = URL.createObjectURL(await res.blob());
-        stage.innerHTML = `<img src="${url}" alt="résultat">`;
-        const dl = $("dl"); dl.href = url; dl.style.display = "block";
-      } catch (e) {
-        stage.innerHTML = `<div style="color:#c66">Erreur : ${e.message}</div>`;
-      } finally {
-        $("go").disabled = false; $("go").textContent = "Appliquer";
-      }
+    // live <output> next to every range
+    document.querySelectorAll('.slider input[type=range]').forEach(r => {
+      const o = r.parentElement.querySelector('output');
+      const sync = () => o.textContent = r.value; r.addEventListener('input', sync); sync();
     });
 
-    renderParams();
+    function fill(sel, items, preferred) {
+      sel.innerHTML = items.map(v => `<option>${v}</option>`).join("");
+      if (preferred && items.includes(preferred)) sel.value = preferred;
+    }
+
+    async function loadModels() {
+      try {
+        const m = await (await fetch(`${API}/models`)).json();
+        fill($("ckpt"), m.checkpoints, "counterfeitV30_v30.safetensors");
+        fill($("lora"), ["(none)", ...m.loras], "SoraWaterColor.safetensors");
+        fill($("sampler"), m.samplers, "dpmpp_2m");
+        fill($("scheduler"), m.schedulers, "karras");
+      } catch (e) { $("status").textContent = "Cannot reach API at " + API + " — is the worker up?"; }
+    }
+
+    // mode toggle
+    $("mode").addEventListener("click", e => {
+      const b = e.target.closest("button"); if (!b) return;
+      mode = b.dataset.mode;
+      document.querySelectorAll("#mode button").forEach(x => x.classList.toggle("on", x === b));
+      $("imageInput").style.display = mode === "image" ? "" : "none";
+      $("sizeHead").style.display = $("sizeRow").style.display = mode === "text" ? "" : "none";
+    });
+
+    // image input: click / drop / paste
+    function showImage(file) {
+      fileData = file;
+      const url = URL.createObjectURL(file);
+      $("drop").innerHTML = `<img src="${url}">`;
+    }
+    $("drop").addEventListener("click", () => $("file").click());
+    $("file").addEventListener("change", e => e.target.files[0] && showImage(e.target.files[0]));
+    $("drop").addEventListener("dragover", e => e.preventDefault());
+    $("drop").addEventListener("drop", e => { e.preventDefault(); const f = e.dataTransfer.files[0]; if (f) showImage(f); });
+    window.addEventListener("paste", e => {
+      const it = [...e.clipboardData.items].find(i => i.type.startsWith("image/"));
+      if (it) showImage(it.getAsFile());
+    });
+
+    function params() {
+      const seed = parseInt($("seed").value);
+      return {
+        mode,
+        ckpt: $("ckpt").value,
+        lora: $("lora").value === "(none)" ? null : $("lora").value,
+        lora_strength: parseFloat($("lora_strength").value),
+        positive: $("positive").value, negative: $("negative").value,
+        steps: parseInt($("steps").value), cfg: parseFloat($("cfg").value),
+        sampler: $("sampler").value, scheduler: $("scheduler").value,
+        seed: seed < 0 ? Math.floor(Math.random() * 1e9) : seed,
+        denoise: parseFloat($("denoise").value),
+        width: parseInt($("width").value), height: parseInt($("height").value),
+        depth_strength: parseFloat($("depth_strength").value),
+        lineart_strength: parseFloat($("lineart_strength").value),
+      };
+    }
+
+    const stage = document.querySelector(".stage");
+    $("go").addEventListener("click", async () => {
+      if (mode === "image" && !fileData) { stage.innerHTML = '<div id="status">Add an image first.</div>'; return; }
+      const fd = new FormData();
+      fd.append("params", JSON.stringify(params()));
+      if (mode === "image") fd.append("image", fileData);
+
+      $("go").disabled = true;
+      stage.innerHTML = '<div id="status">Submitting…</div>';
+      try {
+        const r = await fetch(`${API}/generate`, { method: "POST", body: fd });
+        if (!r.ok) throw new Error(await r.text());
+        const { job_id } = await r.json();
+        const t0 = Date.now();
+        while (true) {
+          await new Promise(s => setTimeout(s, 1500));
+          const s = await (await fetch(`${API}/jobs/${job_id}`)).json();
+          const secs = ((Date.now() - t0) / 1000).toFixed(0);
+          if (s.status === "running") { stage.innerHTML = `<div id="status">Generating… ${secs}s</div>`; continue; }
+          if (s.status === "error") throw new Error(s.error);
+          break;
+        }
+        const url = `${API}/jobs/${job_id}/image`;
+        stage.innerHTML = `<img src="${url}">`;
+        const dl = $("dl"); dl.href = url; dl.style.display = "block";
+      } catch (e) {
+        stage.innerHTML = `<div id="status" style="color:#c66">Error: ${e.message}</div>`;
+      } finally { $("go").disabled = false; }
+    });
+
+    loadModels();
   </script>
 </body>
 </html>
