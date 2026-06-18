@@ -18,6 +18,9 @@ models/
 *.ckpt
 *.pth
 
+# Spike / test artifacts
+worker/*.png
+
 # Build / OS
 dist/
 node_modules/
